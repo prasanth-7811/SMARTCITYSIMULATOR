@@ -144,6 +144,27 @@ streamlit run app.py
 ```
 Open http://localhost:8501 in your browser.
 
+## 11. Deployment
+
+### Streamlit Community Cloud (Recommended)
+
+This is a Streamlit application — **Vercel does not natively support Streamlit** because Streamlit requires a persistent server process, while Vercel serverless functions have short execution timeouts.
+
+To deploy on Streamlit Community Cloud (free, one-click):
+1. Push this repo to GitHub (already done)
+2. Go to https://streamlit.io/cloud/deploy
+3. Connect your GitHub repository `prasanth-7811/SMARTCITYSIMULATOR`
+4. Deploy — no additional configuration needed
+
+### Docker (Railway / Render / Any Container Platform)
+
+A `Dockerfile` and `docker-compose.yml` are included for container-based deployment:
+```bash
+docker build -t coimbatore-smart-traffic .
+docker run -p 8501:8501 coimbatore-smart-traffic
+```
+Open http://localhost:8501 in your browser.
+
 ### Verify the Installation
 Run these from the project root with the venv active:
 
@@ -183,7 +204,7 @@ atomic signal apply, vehicle injection, and the signal → queue linkage.
    plan from the 📋 Signal Plans tab to see before/after KPIs.
 
 
-## 11. Troubleshooting
+## 12. Troubleshooting
 
 | Error | Fix |
 |---|---|
@@ -194,7 +215,7 @@ atomic signal apply, vehicle injection, and the signal → queue linkage.
 | QAOA shows "SA fallback" | Qiskit not installed — `pip install qiskit qiskit-aer` |
 | `streamlit_folium` not found | `pip install streamlit-folium` |
 
-## 12. Known Limitations
+## 13. Known Limitations
 - **This prototype does NOT control actual Coimbatore traffic lights** — everything is simulated
 - QAOA runs on a classical simulator (Qiskit Aer), not real quantum hardware
 - OSMnx requires internet; fallback network used offline
@@ -205,7 +226,7 @@ atomic signal apply, vehicle injection, and the signal → queue linkage.
 - In MANUAL mode a phase is held indefinitely; there is no automatic fail-safe reversion
 - Vehicles are aggregated per road (queue-based), not individually tracked metre-by-metre
 
-## 13. Future Improvements
+## 14. Future Improvements
 - Connect to real traffic sensor APIs
 - Add SUMO integration for microscopic simulation
 - Increase QAOA circuit depth (p > 1)
