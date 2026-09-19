@@ -19,6 +19,19 @@ def kpi_card(label: str, value: str, color: str = "#00c8ff", icon: str = ""):
     )
 
 
+def kpi_cards_row(metrics: dict):
+    """Render a 5-card KPI row with vehicle-specific metrics."""
+    k1, k2, k3, k4, k5 = st.columns(5)
+    with k1: kpi_card("Active Junctions", str(metrics["active_junctions"]), "#00c8ff", "🚦")
+    with k2: kpi_card("Total Vehicles",   str(metrics["total_vehicles"]),   "#00ff88", "🚗")
+    with k3: kpi_card("Moving",           str(metrics.get("vehicles_moving", 0)), "#00cc44", "▶")
+    with k4: kpi_card("Stopped",          str(metrics.get("vehicles_stopped", 0)), "#ff2222", "⏸")
+    with k5:
+        cong = metrics["congestion_pct"]
+        color = "#00cc44" if cong < 30 else ("#ffaa00" if cong < 65 else "#ff2222")
+        kpi_card("Congestion", f"{cong:.0f}%", color, "📊")
+
+
 def signal_badge(direction: str, is_green: bool, duration: float = 0) -> str:
     color  = "#00cc44" if is_green else "#ff2222"
     state  = "GREEN" if is_green else "RED"

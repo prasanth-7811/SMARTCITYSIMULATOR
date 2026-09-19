@@ -30,9 +30,10 @@ def build_traffic_map(
     selected_jid: Optional[str] = None,
     emergency_route: Optional[list] = None,
     osm_graph=None,
-    max_osm_edges: int = 800,   # cap for Streamlit performance
-    show_signals: bool = True,  # draw live signal indicators on junctions
+    max_osm_edges: int = 800,
+    show_signals: bool = True,
     control_mode: Optional[str] = None,
+    vehicles: Optional[list] = None,
 ) -> folium.Map:
     emergency_route = emergency_route or []
 
@@ -191,6 +192,31 @@ def build_traffic_map(
             ).add_to(junc_layer)
 
     junc_layer.add_to(m)
+
+    # ── Vehicle markers ──────────────────────────────────────────────
+    if vehicles:
+        veh_layer = folium.FeatureGroup(name="Vehicles (simulated)", show=True)
+        veh_by_jid: Dict[str, int] = {}
+        for v in vehicles:
+            if isinstance(v, tuple) and len(v) >= 1:
+                jid = v[0]
+            elif hasattr(v, "current_junction"):
+                jid = v.current_junction
+            else:
+                jid = None
+            if jid:
+                veh_by_jid[jid] = veh_by_jid.get(jid, 0) + 1
+        for jid, count in veh_by_jid.items():
+            junc = junctions.get(jid)
+            if junc is None:
+                continue
+            color = "#ff6600" if count > 5 else ("#ffaa00" if count > 2 else "#00cc44")
+            folium.Marker(
+                location=[junc.lat, junc.lon],
+                icon=folium.Icon(color="dark", icon="car", icon_color=color, prefix="glyphicon"),
+                tooltip=f"{count} vehicle(s) at {junc.name} (simulated)",
+            ).add_to(veh_layer)
+        veh_layer.add_to(m)
 
     # ── Legend ────────────────────────────────────────────────────────────────
     mode_line = (

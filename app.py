@@ -8,7 +8,6 @@ All traffic values are SIMULATED.
 """
 import streamlit as st
 import pandas as pd
-import numpy as np
 from streamlit_folium import st_folium
 
 # ── Page config ───────────────────────────────────────────────────────────────
@@ -56,15 +55,15 @@ from optimization.quantum_optimizer import quantum_optimize, QUANTUM_AVAILABLE
 from dashboard.controls import build_traffic_map
 from simulation.ambulance import AmbulanceService
 from dashboard.metrics import (
-    kpi_card, render_signal_panel, render_road_metrics,
+    kpi_cards_row, render_signal_panel, render_road_metrics,
     mode_badge, render_junction_info, current_phase_label,
 )
 from dashboard.charts import (
     history_chart, comparison_chart, density_bar_chart,
-    queue_chart, optimizer_comparison_chart,
+    queue_chart, optimizer_comparison_chart, vehicle_road_chart,
 )
 from simulation.junction import DIRECTIONS
-from utils.helpers import format_seconds, MIN_GREEN, MAX_GREEN
+from utils.helpers import MIN_GREEN, MAX_GREEN
 
 # ── Session state bootstrap ───────────────────────────────────────────────────
 @st.cache_resource(show_spinner="Loading Coimbatore road network…")
@@ -210,6 +209,26 @@ with st.sidebar:
     if "flow_slider" not in st.session_state:
         st.session_state.flow_slider = float(engine.demand_multiplier)
 
+    # Density presets
+    col_dp1, col_dp2, col_dp3, col_dp4 = st.columns(4)
+    with col_dp1:
+        if st.button("🟢 Low", key="preset_low"):
+            engine.set_demand_multiplier(0.5)
+            st.session_state.flow_slider = 0.5
+            st.rerun()
+    with col_dp2:
+        if st.button("🟡 Med", key="preset_med"):
+            engine.set_demand_multiplier(1.5)
+            st.session_state.flow_slider = 1.5
+            st.rerun()
+    with col_dp3:
+        if st.button("🟠 High", key="preset_high"):
+            engine.set_demand_multiplier(3.0)
+            st.session_state.flow_slider = 3.0
+            st.rerun()
+    with col_dp4:
+        st.caption("")
+
     flow = st.slider(
         "Traffic density multiplier",
         min_value=0.1, max_value=5.0, step=0.1,
@@ -218,6 +237,13 @@ with st.sidebar:
     )
     if abs(engine.demand_multiplier - flow) > 1e-9:
         engine.set_demand_multiplier(flow)
+
+    # Simulation speed
+    sim_speed = st.selectbox(
+        "Sim speed", ["1x", "2x", "5x", "10x"],
+        key="sim_speed", index=0,
+    )
+    speed_map = {"1x": 1, "2x": 2, "5x": 5, "10x": 10}
 
     add_count = st.number_input(
         "Vehicles to inject", min_value=1, max_value=100, value=5, step=1,
@@ -276,6 +302,31 @@ with st.sidebar:
 
     st.caption(SCENARIOS.get(scenario_key, {}).get("desc", ""))
 
+    # ── Road Closure ──────────────────────────────────────────────
+    st.markdown("---")
+    st.markdown("<div class='section-header'>⛔ ROAD CLOSURE</div>", unsafe_allow_html=True)
+    closure_jid = st.selectbox(
+        "Select junction to close",
+        list(junctions.keys()),
+        format_func=lambda k: junctions[k].name,
+        key="closure_jid",
+    )
+    if st.button("🔒 Close Road", key="btn_close_road"):
+        engine.close_road(closure_jid)
+        st.session_state.control_msg = (
+            "warn", f"⛔ {junctions[closure_jid].name} is CLOSED — traffic rerouted (simulated)"
+        )
+        st.rerun()
+    if st.button("🔓 Open Road", key="btn_open_road"):
+        engine.open_road(closure_jid)
+        st.session_state.control_msg = (
+            "ok", f"✅ {junctions[closure_jid].name} is now OPEN"
+        )
+        st.rerun()
+    if st.session_state.get("control_msg"):
+        _kind, _msg = st.session_state.control_msg
+        (st.success if _kind == "ok" else st.warning)(_msg)
+
     st.markdown("---")
     st.markdown("<div class='section-header'>🔬 OPTIMIZER</div>", unsafe_allow_html=True)
     q_status = "🟢 Qiskit Aer available" if QUANTUM_AVAILABLE else "🔴 Qiskit unavailable — SA fallback"
@@ -321,49 +372,64 @@ with st.sidebar:
         )
         st.rerun()
 
+    # ── What-If Simulator ──────────────────────────────────────
+    st.markdown("---")
+    st.markdown("<div class='section-header'>🔮 WHAT-IF SIMULATOR</div>", unsafe_allow_html=True)
+    st.caption("Test a scenario, compare with current state. Runs 20 sim steps.")
+
+    wf_density = st.slider("What-if density multiplier", 0.1, 5.0, 1.0, 0.1, key="wf_density")
+    wf_steps = st.selectbox("What-if steps", [10, 20, 50, 100], key="wf_steps")
+    jid0 = list(junctions.keys())[0]
+    wf_jid = st.selectbox("What-if junction", list(junctions.keys()), key="wf_jid")
+    wf_grn = st.slider("What-if green duration (s)", 10, 90, 30, 5, key="wf_grn")
+
+    if st.button("🔮 Run What-If", key="btn_whatif"):
+        # Snapshot current metrics
+        before = engine.current_metrics()
+        # Temporarily apply changes
+        orig_mult = engine._demand_multiplier
+        orig_grn = junctions[wf_jid].signals["N"].green_duration
+        engine.set_demand_multiplier(wf_density)
+        junctions[wf_jid].signals["N"].green_duration = wf_grn
+        junctions[wf_jid].signals["S"].green_duration = wf_grn
+        for _ in range(int(wf_steps)):
+            engine.force_step()
+        after = engine.current_metrics()
+        # Restore
+        engine.set_demand_multiplier(orig_mult)
+        junctions[wf_jid].signals["N"].green_duration = orig_grn
+        junctions[wf_jid].signals["S"].green_duration = orig_grn
+        st.session_state.wf_before = before
+        st.session_state.wf_after = after
+        st.rerun()
+
+    if st.session_state.get("wf_before") and st.session_state.get("wf_after"):
+        b = st.session_state.wf_before
+        a = st.session_state.wf_after
+        wf_data = [
+            {"Metric": "Total Vehicles", "Before": b["total_vehicles"], "After": a["total_vehicles"],
+             "Diff": a["total_vehicles"] - b["total_vehicles"]},
+            {"Metric": "Avg Wait (s)", "Before": round(b["avg_wait"], 1), "After": round(a["avg_wait"], 1),
+             "Diff": round(a["avg_wait"] - b["avg_wait"], 1)},
+            {"Metric": "Total Queue", "Before": round(b["total_queue"], 1), "After": round(a["total_queue"], 1),
+             "Diff": round(a["total_queue"] - b["total_queue"], 1)},
+            {"Metric": "Congestion %", "Before": round(b["congestion_pct"], 1), "After": round(a["congestion_pct"], 1),
+             "Diff": round(a["congestion_pct"] - b["congestion_pct"], 1)},
+            {"Metric": "Vehicles Moving", "Before": b.get("vehicles_moving", 0), "After": a.get("vehicles_moving", 0),
+             "Diff": a.get("vehicles_moving", 0) - b.get("vehicles_moving", 0)},
+            {"Metric": "Vehicles Stopped", "Before": b.get("vehicles_stopped", 0), "After": a.get("vehicles_stopped", 0),
+             "Diff": a.get("vehicles_stopped", 0) - b.get("vehicles_stopped", 0)},
+        ]
+        st.dataframe(pd.DataFrame(wf_data), use_container_width=True, hide_index=True)
+        st.caption("⚠ WHAT-IF results are SIMULATED projections, not real-time Coimbatore data.")
+
 # ── Auto-step when running ────────────────────────────────────────────────────
 if not engine.paused:
     engine.step_sim()
 
 # ── KPI Row ───────────────────────────────────────────────────────────────────
 metrics = engine.current_metrics()
-
-
-def _dataset_kpis(junctions):
-    total_veh = 0
-    total_queue = 0.0
-    densities = []
-    for jid, junc in junctions.items():
-        for rid, road in list(junc.roads_in.items()) + list(junc.roads_out.items()):
-            total_veh += int(road.density * road.capacity)
-            total_queue += road.density * road.capacity
-            densities.append(road.density)
-    avg_dens = float(np.mean(densities)) if densities else 0.0
-    congestion_pct = (sum(1 for d in densities if d > 0.65) / len(densities) * 100) if densities else 0.0
-    avg_wait = avg_dens * 30.0
-    return total_veh, avg_wait, total_queue, congestion_pct
-
-
-if metrics["total_vehicles"] == 0 and not engine.history:
-    ds_veh, ds_wait, ds_queue, ds_cong = _dataset_kpis(junctions)
-    total_vehicles_val = str(ds_veh) if ds_veh > 0 else str(metrics["total_vehicles"])
-    avg_wait_val = format_seconds(ds_wait) if ds_wait > 0 else format_seconds(metrics["avg_wait"])
-    total_queue_val = f"{ds_queue:.0f}" if ds_queue > 0 else f"{metrics['total_queue']:.0f}"
-    cong_val = ds_cong
-else:
-    total_vehicles_val = str(metrics["total_vehicles"])
-    avg_wait_val = format_seconds(metrics["avg_wait"])
-    total_queue_val = f"{metrics['total_queue']:.0f}"
-    cong_val = metrics["congestion_pct"]
-
-k1, k2, k3, k4, k5 = st.columns(5)
-with k1: kpi_card("Active Junctions", str(metrics["active_junctions"]), "#00c8ff", "🚦")
-with k2: kpi_card("Total Vehicles",   total_vehicles_val,   "#00ff88", "🚗")
-with k3: kpi_card("Avg Wait",         avg_wait_val, "#ffb300", "⏱")
-with k4: kpi_card("Total Queue",      total_queue_val,  "#ff6600", "🚧")
-with k5:
-    color = "#00cc44" if cong_val < 30 else ("#ffaa00" if cong_val < 65 else "#ff2222")
-    kpi_card("Congestion", f"{cong_val:.0f}%", color, "📊")
+kpi_cards_row(metrics)
 
 st.markdown("---")
 
@@ -380,6 +446,7 @@ with col_map:
         sel_jid, emerg_route_tuple, step,
         densities_tuple, queues_tuple,
         signal_tuple, mode,
+        vehicles=None,
     ):
         """Re-build map only when traffic OR signal state actually changes."""
         return build_traffic_map(
@@ -389,6 +456,7 @@ with col_map:
             osm_graph=st.session_state.get("osm_graph"),
             show_signals=True,
             control_mode=mode,
+            vehicles=vehicles,
         )
 
     # Create a hashable summary of current traffic + signal state.
@@ -405,6 +473,9 @@ with col_map:
         for j in junctions.values()
     )
 
+    veh_snapshot = tuple(
+        (v.current_junction, v.vehicle_id) for v in engine.vehicles
+    )
     traffic_map = _cached_map(
         st.session_state.selected_jid,
         tuple(st.session_state.emergency_route),
@@ -413,6 +484,7 @@ with col_map:
         queue_snapshot,
         signal_snapshot,
         engine.control_mode,
+        vehicles=veh_snapshot,
     )
 
     st_folium(
@@ -589,7 +661,8 @@ with tab1:
     if engine.history:
         df_hist = pd.DataFrame([
             {"Step": h.step, "Elapsed (s)": h.elapsed,
-             "Vehicles": h.total_vehicles, "Avg Wait (s)": f"{h.avg_wait:.1f}",
+             "Vehicles": h.total_vehicles, "Moving": getattr(h, "vehicles_moving", "—"),
+             "Avg Wait (s)": f"{h.avg_wait:.1f}",
              "Total Queue": f"{h.total_queue:.1f}", "Congestion %": f"{h.congestion_pct:.0f}%"}
             for h in engine.history[-20:]
         ])
@@ -602,11 +675,26 @@ with tab2:
     with c_q:
         st.plotly_chart(queue_chart(junctions), use_container_width=True)
 
-    # Full junction table
+    c_v1, c_v2 = st.columns(2)
+    with c_v1:
+        st.plotly_chart(vehicle_road_chart(junctions), use_container_width=True)
+    with c_v2:
+        m = engine.current_metrics()
+        st.metric("Vehicles Moving", m.get("vehicles_moving", 0),
+                   delta=m.get("vehicles_moving", 0) - engine.history[-1].vehicles_moving if engine.history else 0)
+        st.metric("Vehicles Stopped", m.get("vehicles_stopped", 0),
+                   delta=0)
+
+    # Full junction table with moving/stopped
     rows = []
     for jid, junc in junctions.items():
+        j_veh = sum(1 for v in engine.vehicles if v.current_junction == jid)
+        j_moving = sum(1 for v in engine.vehicles
+                       if v.current_junction == jid and v.route and not v.is_at_destination())
         rows.append({
             "Junction": junc.name,
+            "Vehicles": j_veh,
+            "Moving": j_moving,
             "Avg Density": f"{junc.avg_density():.0%}",
             "Total Queue": f"{junc.total_queue():.1f}",
             "Active Greens": ", ".join(junc.active_greens()),
@@ -851,5 +939,6 @@ with tab5:
 # ── Auto-refresh when simulation is running ───────────────────────────────────
 if not engine.paused:
     import time
-    time.sleep(0.5)
+    speed_map = {"1x": 1.0, "2x": 0.6, "5x": 0.3, "10x": 0.15}
+    time.sleep(speed_map.get(st.session_state.get("sim_speed", "1x"), 0.5))
     st.rerun()

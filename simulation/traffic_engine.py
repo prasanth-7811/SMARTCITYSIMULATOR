@@ -25,10 +25,12 @@ class SimSnapshot:
     step: int
     elapsed: float
     total_vehicles: int
-    avg_wait: float
-    total_queue: float
-    avg_density: float
-    congestion_pct: float   # % of roads above 65% density
+    vehicles_moving: int = 0
+    vehicles_stopped: int = 0
+    avg_wait: float = 0.0
+    total_queue: float = 0.0
+    avg_density: float = 0.0
+    congestion_pct: float = 0.0
 
 
 class TrafficEngine:
@@ -201,11 +203,15 @@ class TrafficEngine:
                      for r in list(j.roads_in.values()) + list(j.roads_out.values())]
         densities = [r.density for r in all_roads] or [0.0]
         queues    = [r.queue   for r in all_roads]
+        moving    = sum(1 for v in self.vehicles if not v.is_at_destination() and v.route)
+        stopped   = len(self.vehicles) - moving
         heavy     = sum(1 for d in densities if d > 0.65)
         self.history.append(SimSnapshot(
             step=self.step,
             elapsed=self.elapsed,
             total_vehicles=len(self.vehicles),
+            vehicles_moving=moving,
+            vehicles_stopped=stopped,
             avg_wait=float(np.mean(waits)),
             total_queue=float(sum(queues)),
             avg_density=float(np.mean(densities)),
@@ -220,6 +226,8 @@ class TrafficEngine:
                      for r in list(j.roads_in.values()) + list(j.roads_out.values())]
         densities = [r.density for r in all_roads] or [0.0]
         queues    = [r.queue   for r in all_roads]
+        moving    = sum(1 for v in self.vehicles if not v.is_at_destination() and v.route)
+        stopped   = len(self.vehicles) - moving
         return {
             "total_vehicles": len(self.vehicles),
             "avg_wait":       float(np.mean(waits)),
@@ -229,6 +237,8 @@ class TrafficEngine:
             "congestion_pct": safe_div(
                 sum(1 for d in densities if d > 0.65), len(densities), 0
             ) * 100,
+            "vehicles_moving": moving,
+            "vehicles_stopped": stopped,
         }
 
     # ── Manual signal control ─────────────────────────────────────────────────

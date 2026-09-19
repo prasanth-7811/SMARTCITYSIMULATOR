@@ -128,3 +128,22 @@ def optimizer_comparison_chart(classical_result: dict, quantum_result: dict) -> 
     fig.update_layout(**DARK, height=280,
                       title="Classical vs Quantum Optimizer Comparison (actual measured values)")
     return _dk(fig)
+
+
+def vehicle_road_chart(junctions: dict) -> go.Figure:
+    names, queues = [], []
+    for jid, junc in junctions.items():
+        for rid, road in {**junc.roads_in, **junc.roads_out}.items():
+            label = f"{road.from_junction[:8]}→{road.to_junction[:8]}"
+            names.append(label)
+            queues.append(road.queue)
+    fig = go.Figure(go.Bar(
+        x=names, y=queues,
+        marker_color="#6400ff",
+        text=[f"{q:.0f}" for q in queues],
+        textposition="outside",
+    ))
+    fig.update_layout(**DARK, height=260, title="Vehicle Queue per Road (simulated)",
+                      xaxis=dict(tickangle=-45),
+                      yaxis=dict(title="Vehicles"))
+    return _dk(fig)
