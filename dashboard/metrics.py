@@ -139,6 +139,6 @@ def render_road_metrics(junction):
         })
     if rows:
         import pandas as pd
-        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+        st.dataframe(pd.DataFrame(rows), width='stretch', hide_index=True)
     else:
         st.info("No incoming roads for this junction.")

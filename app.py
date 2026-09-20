@@ -61,6 +61,7 @@ from dashboard.metrics import (
 from dashboard.charts import (
     history_chart, comparison_chart, density_bar_chart,
     queue_chart, optimizer_comparison_chart, vehicle_road_chart,
+    junction_congestion_chart, sumo_history_chart,
 )
 from simulation.junction import DIRECTIONS
 from utils.helpers import MIN_GREEN, MAX_GREEN
@@ -153,6 +154,14 @@ with st.sidebar:
     with col_s3:
         if st.button("🔄 Reset", key="btn_reset"):
             engine.reset()
+            _mgr = st.session_state.get("sumo_manager")
+            if _mgr is not None:
+                try:
+                    _mgr.stop()
+                except Exception:
+                    pass
+            st.session_state.sumo_manager = None
+            st.session_state.sumo_last = None
             st.session_state.classical_result = None
             st.session_state.quantum_result   = None
             st.session_state.before_metrics   = None
@@ -169,6 +178,13 @@ with st.sidebar:
     with col_m1:
         if st.button("⏭ Step", key="btn_step"):
             engine.force_step()
+            _mgr = st.session_state.get("sumo_manager")
+            if _mgr is not None and _mgr.connected:
+                try:
+                    st.session_state.sumo_last = _mgr.step(5)
+                except Exception as exc:
+                    st.session_state.sumo_msg = ("err",
+                                                 f"SUMO step failed: {exc}")
             st.rerun()
     with col_m2:
         if st.button("⏭⏭ Step × 10", key="btn_step10"):
@@ -243,7 +259,6 @@ with st.sidebar:
         "Sim speed", ["1x", "2x", "5x", "10x"],
         key="sim_speed", index=0,
     )
-    speed_map = {"1x": 1, "2x": 2, "5x": 5, "10x": 10}
 
     add_count = st.number_input(
         "Vehicles to inject", min_value=1, max_value=100, value=5, step=1,
@@ -264,6 +279,75 @@ with st.sidebar:
         _kind, _msg = st.session_state.control_msg
         (st.success if _kind == "ok" else st.warning)(_msg)
 
+    st.markdown("---")
+    st.markdown("<div class='section-header'>🏙 SUMO CO-SIMULATION</div>",
+                unsafe_allow_html=True)
+    try:
+        from simulation.sumo_backend import describe_backend, get_manager
+        from simulation.sumo_env import DEMAND_VPH
+        _backend = describe_backend()
+    except Exception as _be:
+        st.error(f"SUMO backend import failed: {_be}")
+        _backend = {"sumo_gui": None, "sumo_cli": None,
+                    "traci_importable": False}
+
+    if _backend["sumo_gui"] and _backend["traci_importable"]:
+        st.caption("SUMO available — launch a live co-simulation "
+                   "(synthetic network, not real geometry).")
+        sumo_density = st.selectbox(
+            "SUMO demand",
+            ["low", "medium", "high"],
+            index=["low", "medium", "high"].index(
+                st.session_state.get("sumo_density", "medium")),
+            key="sumo_density",
+            help="Low/Medium/High scale SUMO flows (vehicles/hour per route).")
+        sumo_gui = st.checkbox("Open SUMO GUI window", value=True,
+                               key="sumo_use_gui")
+        col_s1, col_s2 = st.columns(2)
+        with col_s1:
+            if st.button("🚀 Launch SUMO", key="sumo_launch"):
+                try:
+                    from simulation.sumo_backend import connect as _sumo_connect
+                    _mgr = get_manager("default")
+                    _snap = _sumo_connect(_mgr, density=sumo_density,
+                                           gui=sumo_gui)
+                    st.session_state.sumo_manager = _mgr
+                    st.session_state.sumo_last = _snap
+                    st.session_state.sumo_msg = (
+                        "ok",
+                        f"SUMO launched ({sumo_density} demand, "
+                        f"{DEMAND_VPH[sumo_density]} veh/h per route). "
+                        "Press ▶ Start to advance steps.")
+                except Exception as exc:
+                    st.session_state.sumo_msg = ("err", str(exc))
+                st.rerun()
+        with col_s2:
+            if st.button("⏹ Stop SUMO", key="sumo_stop"):
+                _mgr = st.session_state.get("sumo_manager")
+                if _mgr is not None:
+                    try:
+                        _mgr.stop()
+                    except Exception:
+                        pass
+                st.session_state.sumo_manager = None
+                st.session_state.sumo_last = None
+                st.session_state.sumo_msg = ("ok", "SUMO stopped.")
+                st.rerun()
+        _sumo_msg = st.session_state.get("sumo_msg")
+        if _sumo_msg:
+            (st.success if _sumo_msg[0] == "ok" else st.error)(_sumo_msg[1])
+        _sm = st.session_state.get("sumo_manager")
+        if _sm is not None and _sm.connected:
+            st.success(
+                f"🟢 SUMO live — step {_sm.step_count} · "
+                f"elapsed {_sm.elapsed:.0f}s · port {_sm.port}")
+        elif _sm is not None:
+            st.caption("SUMO is stopped. Launch it to run the co-simulation.")
+    else:
+        st.warning(
+            "SUMO is not installed in this venv. Run:\n\n"
+            "```bash\npip install eclipse-sumo\n```\n\n"
+            "The abstract simulation above still works without SUMO.")
     st.markdown("---")
     st.markdown("<div class='section-header'>🎬 SCENARIO</div>", unsafe_allow_html=True)
     scenario_key = st.selectbox(
@@ -313,15 +397,27 @@ with st.sidebar:
     )
     if st.button("🔒 Close Road", key="btn_close_road"):
         engine.close_road(closure_jid)
-        st.session_state.control_msg = (
-            "warn", f"⛔ {junctions[closure_jid].name} is CLOSED — traffic rerouted (simulated)"
-        )
+        _mgr = st.session_state.get("sumo_manager")
+        if _mgr is not None and _mgr.connected:
+            msg = _mgr.set_road_closed(closure_jid, True)
+            st.session_state.control_msg = (
+                "warn", f"⛔ {junctions[closure_jid].name} is CLOSED — "
+                        f"traffic rerouted (simulated). {msg}")
+        else:
+            st.session_state.control_msg = (
+                "warn", f"⛔ {junctions[closure_jid].name} is CLOSED — "
+                        "traffic rerouted (simulated)")
         st.rerun()
     if st.button("🔓 Open Road", key="btn_open_road"):
         engine.open_road(closure_jid)
-        st.session_state.control_msg = (
-            "ok", f"✅ {junctions[closure_jid].name} is now OPEN"
-        )
+        _mgr = st.session_state.get("sumo_manager")
+        if _mgr is not None and _mgr.connected:
+            msg = _mgr.set_road_closed(closure_jid, False)
+            st.session_state.control_msg = (
+                "ok", f"✅ {junctions[closure_jid].name} is now OPEN. {msg}")
+        else:
+            st.session_state.control_msg = (
+                "ok", f"✅ {junctions[closure_jid].name} is now OPEN")
         st.rerun()
     if st.session_state.get("control_msg"):
         _kind, _msg = st.session_state.control_msg
@@ -420,15 +516,33 @@ with st.sidebar:
             {"Metric": "Vehicles Stopped", "Before": b.get("vehicles_stopped", 0), "After": a.get("vehicles_stopped", 0),
              "Diff": a.get("vehicles_stopped", 0) - b.get("vehicles_stopped", 0)},
         ]
-        st.dataframe(pd.DataFrame(wf_data), use_container_width=True, hide_index=True)
+        st.dataframe(pd.DataFrame(wf_data), width='stretch', hide_index=True)
         st.caption("⚠ WHAT-IF results are SIMULATED projections, not real-time Coimbatore data.")
 
 # ── Auto-step when running ────────────────────────────────────────────────────
 if not engine.paused:
     engine.step_sim()
 
+_sumo_mgr = st.session_state.get("sumo_manager")
+if _sumo_mgr is not None and _sumo_mgr.connected and not engine.paused:
+    try:
+        _sumo_snap = _sumo_mgr.step(5)
+        st.session_state.sumo_last = _sumo_snap
+    except Exception as exc:
+        st.session_state.sumo_msg = ("err", f"SUMO step failed: {exc}")
+        _sumo_mgr.stop()
+
 # ── KPI Row ───────────────────────────────────────────────────────────────────
 metrics = engine.current_metrics()
+_s = st.session_state.get("sumo_last")
+if _sumo_mgr is not None and _sumo_mgr.connected and _s and _s.get("connected"):
+    metrics["total_vehicles"] = _s.get("total_vehicles", metrics["total_vehicles"])
+    metrics["vehicles_moving"] = _s.get("moving", 0)
+    metrics["vehicles_stopped"] = _s.get("waiting", 0)
+    metrics["avg_wait"] = _s.get("avg_wait", 0.0)
+    metrics["total_queue"] = sum(_s.get("queue_by_junction", {}).values())
+    _tv = _s.get("total_vehicles") or 1
+    metrics["congestion_pct"] = round(100.0 * _s.get("waiting", 0) / _tv, 1)
 kpi_cards_row(metrics)
 
 st.markdown("---")
@@ -473,9 +587,12 @@ with col_map:
         for j in junctions.values()
     )
 
-    veh_snapshot = tuple(
-        (v.current_junction, v.vehicle_id) for v in engine.vehicles
-    )
+    veh_snapshot = list(engine.get_vehicle_positions())
+    if _sumo_mgr is not None and _sumo_mgr.connected:
+        try:
+            veh_snapshot += _sumo_mgr.get_vehicle_positions()
+        except Exception:
+            pass
     traffic_map = _cached_map(
         st.session_state.selected_jid,
         tuple(st.session_state.emergency_route),
@@ -571,10 +688,18 @@ with col_ctrl:
     with qc1:
         if st.button("🟢 NS Phase", key=f"ns_{selected_jid}"):
             junc.apply_phase(["N", "S"], {"N": 35, "S": 35})
+            if st.session_state.get("sumo_manager") is not None:
+                msg = st.session_state.sumo_manager.apply_signal(
+                    selected_jid, "NS")
+                st.session_state.control_msg = ("ok", msg)
             st.rerun()
     with qc2:
         if st.button("🟢 EW Phase", key=f"ew_{selected_jid}"):
             junc.apply_phase(["E", "W"], {"E": 35, "W": 35})
+            if st.session_state.get("sumo_manager") is not None:
+                msg = st.session_state.sumo_manager.apply_signal(
+                    selected_jid, "EW")
+                st.session_state.control_msg = ("ok", msg)
             st.rerun()
 
     # ── Deferred operator signal desk (atomic, conflict-safe apply) ──────────
@@ -630,6 +755,17 @@ with col_ctrl:
         if st.button("✅ Apply Signal", key=f"apply_{selected_jid}"):
             warns = engine.apply_junction_signals(selected_jid, pending, pdur)
             st.session_state.signal_warnings = warns
+            _sumo_m = st.session_state.get("sumo_manager")
+            if _sumo_m is not None and _sumo_m.connected:
+                axis = "NS" if (pending.get("N") or pending.get("S")) else "EW"
+                if axis == "NS":
+                    _axis_dir = "N" if pending.get("N") else "S"
+                else:
+                    _axis_dir = "E" if pending.get("E") else "W"
+                _msg = _sumo_m.apply_signal(selected_jid, axis)
+                _msg += " " + _sumo_m.set_green_duration(
+                    selected_jid, float(pdur.get(_axis_dir, 30)))
+                st.session_state.control_msg = ("ok", _msg)
             st.rerun()
     with ap2:
         if st.button("Reload From Live", key=f"reload_{selected_jid}"):
@@ -657,7 +793,7 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 ])
 
 with tab1:
-    st.plotly_chart(history_chart(engine.history), use_container_width=True)
+    st.plotly_chart(history_chart(engine.history), width='stretch')
     if engine.history:
         df_hist = pd.DataFrame([
             {"Step": h.step, "Elapsed (s)": h.elapsed,
@@ -666,18 +802,25 @@ with tab1:
              "Total Queue": f"{h.total_queue:.1f}", "Congestion %": f"{h.congestion_pct:.0f}%"}
             for h in engine.history[-20:]
         ])
-        st.dataframe(df_hist, use_container_width=True, hide_index=True)
+        st.dataframe(df_hist, width='stretch', hide_index=True)
+    _sm = st.session_state.get("sumo_manager")
+    if _sm is not None and _sm.history:
+        st.plotly_chart(sumo_history_chart(_sm.history), width='stretch')
+        st.caption("🟢 Live SUMO/TraCI telemetry (synthetic network).")
 
 with tab2:
     c_d, c_q = st.columns(2)
     with c_d:
-        st.plotly_chart(density_bar_chart(junctions), use_container_width=True)
+        st.plotly_chart(density_bar_chart(junctions), width='stretch')
     with c_q:
-        st.plotly_chart(queue_chart(junctions), use_container_width=True)
+        st.plotly_chart(queue_chart(junctions), width='stretch')
+
+    # Junction congestion chart (density + queue per junction)
+    st.plotly_chart(junction_congestion_chart(junctions), width='stretch')
 
     c_v1, c_v2 = st.columns(2)
     with c_v1:
-        st.plotly_chart(vehicle_road_chart(junctions), use_container_width=True)
+        st.plotly_chart(vehicle_road_chart(junctions), width='stretch')
     with c_v2:
         m = engine.current_metrics()
         st.metric("Vehicles Moving", m.get("vehicles_moving", 0),
@@ -701,7 +844,7 @@ with tab2:
             "Demand": f"{junc.demand:.2f}",
             "Blocked": "⛔" if junc.is_blocked else "✅",
         })
-    st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+    st.dataframe(pd.DataFrame(rows), width='stretch', hide_index=True)
 
 with tab3:
     cr = st.session_state.classical_result
@@ -718,7 +861,7 @@ with tab3:
             st.caption(qr.get("note", ""))
 
         if cr and qr:
-            st.plotly_chart(optimizer_comparison_chart(cr, qr), use_container_width=True)
+            st.plotly_chart(optimizer_comparison_chart(cr, qr), width='stretch')
 
         # Before / After comparison
         bm = st.session_state.before_metrics
@@ -732,7 +875,7 @@ with tab3:
                     ac or bm,
                     aq or bm,
                 ),
-                use_container_width=True,
+                width='stretch',
             )
             comp_rows = []
             for label, d in [("Before", bm), ("After Classical", ac or {}), ("After Quantum", aq or {})]:
@@ -744,7 +887,7 @@ with tab3:
                         "Avg Density": f"{d.get('avg_density',0):.0%}",
                         "Vehicles": d.get("total_vehicles", 0),
                     })
-            st.dataframe(pd.DataFrame(comp_rows), use_container_width=True, hide_index=True)
+            st.dataframe(pd.DataFrame(comp_rows), width='stretch', hide_index=True)
             st.caption(
                 "Note: QAOA runs on a classical Qiskit Aer simulator — not real quantum hardware. "
                 "Results reflect actual measured simulation values. No improvements are hardcoded."
@@ -763,7 +906,7 @@ with tab4:
                 "Green Duration (s)": f"{sig.green_duration:.0f}",
                 "Elapsed (s)": f"{sig.elapsed:.0f}",
             })
-    st.dataframe(pd.DataFrame(plan_rows), use_container_width=True, hide_index=True)
+    st.dataframe(pd.DataFrame(plan_rows), width='stretch', hide_index=True)
 
     if st.session_state.classical_result:
         st.markdown("**Classical Optimizer Signal Plan**")
@@ -776,7 +919,7 @@ with tab4:
                 "Green Directions": ", ".join(cfg.get("greens", [])),
                 "Durations (s)": str(cfg.get("durations", {})),
             })
-        st.dataframe(pd.DataFrame(p_rows), use_container_width=True, hide_index=True)
+        st.dataframe(pd.DataFrame(p_rows), width='stretch', hide_index=True)
 
     if st.session_state.quantum_result:
         st.markdown("**Quantum Optimizer Signal Plan**")
@@ -790,7 +933,7 @@ with tab4:
                 "Durations (s)": str(cfg.get("durations", {})),
                 "Bitstring": st.session_state.quantum_result.get("bitstring", ""),
             })
-        st.dataframe(pd.DataFrame(p_rows), use_container_width=True, hide_index=True)
+        st.dataframe(pd.DataFrame(p_rows), width='stretch', hide_index=True)
 
 with tab5:
     amb_svc: AmbulanceService = st.session_state.ambulance_svc
@@ -854,7 +997,7 @@ with tab5:
     with btn_col:
         st.markdown("**&nbsp;**")
         st.markdown('<div class="dispatch-btn">', unsafe_allow_html=True)
-        dispatched = st.button("🚑 DISPATCH\nFREE LANE", key="dispatch_btn", use_container_width=True)
+        dispatched = st.button("🚑 DISPATCH\nFREE LANE", key="dispatch_btn", width='stretch')
         st.markdown('</div>', unsafe_allow_html=True)
         if dispatched:
             unit = amb_svc.dispatch(amb_origin, amb_dest)
@@ -903,21 +1046,21 @@ with tab5:
                 "ETA Total": f"{u.eta_seconds:.0f}s",
                 "Status": {"en_route": "🚑 En Route", "arrived": "✅ Arrived", "idle": "⏹ Idle"}.get(u.status, u.status),
             })
-        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+        st.dataframe(pd.DataFrame(rows), width='stretch', hide_index=True)
 
         mgmt1, mgmt2, mgmt3 = st.columns(3)
         with mgmt1:
             cancel_uid = st.selectbox("Select unit to cancel", list(amb_svc.units.keys()), key="cancel_sel")
         with mgmt2:
             st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("❌ Cancel & Restore Signals", key="cancel_btn", use_container_width=True):
+            if st.button("❌ Cancel & Restore Signals", key="cancel_btn", width='stretch'):
                 amb_svc.cancel(cancel_uid)
                 st.session_state.emergency_route = amb_svc.all_route_junctions()
                 st.session_state.amb_msg = ("ok", f"Unit {cancel_uid} cancelled. Signals restored.")
                 st.rerun()
         with mgmt3:
             st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("🧹 Clear Arrived", key="clear_btn", use_container_width=True):
+            if st.button("🧹 Clear Arrived", key="clear_btn", width='stretch'):
                 amb_svc.clear_arrived()
                 st.session_state.emergency_route = amb_svc.all_route_junctions()
                 st.rerun()
@@ -928,11 +1071,13 @@ with tab5:
 
     # ── Live route map (always visible) ──────────────────────────────────────
     st.markdown("**🗺 Live Ambulance Route Map**")
+    amb_vehicle_positions = engine.get_vehicle_positions()
     amb_route_map = build_traffic_map(
         junctions,
         selected_jid=None,
         emergency_route=list(active_jids),
         osm_graph=st.session_state.get("osm_graph"),
+        vehicles=amb_vehicle_positions,
     )
     st_folium(amb_route_map, width="100%", height=450, key="amb_map")
 

@@ -197,15 +197,34 @@ def build_traffic_map(
     if vehicles:
         veh_layer = folium.FeatureGroup(name="Vehicles (simulated)", show=True)
         veh_by_jid: Dict[str, int] = {}
+
+        # Process vehicles - handle both old-style (vehicles list) and new-style (vehicle positions)
         for v in vehicles:
-            if isinstance(v, tuple) and len(v) >= 1:
+            if isinstance(v, dict) and v.get("type") == "transit":
+                # New-style transit vehicle: place marker along the road
+                folium.CircleMarker(
+                    location=[v["lat"], v["lon"]],
+                    radius=max(3, v.get("size", 5)),
+                    color=v.get("color", "#4488ff"),
+                    fill=True,
+                    fill_color=v.get("color", "#4488ff"),
+                    fill_opacity=0.8,
+                    tooltip=f"Vehicle {v.get('id', '?')} — wait {v.get('wait_time', 0):.0f}s (simulated)",
+                    popup=f"Vehicle {v.get('id', '?')}\nPosition: {v.get('position', 0):.0%} along road\nWait time: {v.get('wait_time', 0):.0f}s",
+                ).add_to(veh_layer)
+            elif isinstance(v, dict) and v.get("type") == "junction":
+                # Junction vehicle - count toward aggregate
+                jid = v.get("junction_id")
+                if jid:
+                    veh_by_jid[jid] = veh_by_jid.get(jid, 0) + 1
+            elif isinstance(v, tuple) and len(v) >= 1:
                 jid = v[0]
+                veh_by_jid[jid] = veh_by_jid.get(jid, 0) + 1
             elif hasattr(v, "current_junction"):
                 jid = v.current_junction
-            else:
-                jid = None
-            if jid:
                 veh_by_jid[jid] = veh_by_jid.get(jid, 0) + 1
+
+        # Render aggregate junction markers for remaining vehicles
         for jid, count in veh_by_jid.items():
             junc = junctions.get(jid)
             if junc is None:

@@ -76,7 +76,11 @@ class TrafficEngine:
         except Exception:
             route = [origin, dest]
 
-        v = Vehicle(current_junction=origin, destination_junction=dest, route=route)
+        v = Vehicle(
+            current_junction=origin,
+            destination_junction=dest,
+            route=route,
+        )
         self.vehicles.append(v)
 
         # The vehicle joins the queue on the first road of its route
@@ -127,15 +131,52 @@ class TrafficEngine:
     def _move_vehicles(self):
         """Advance every vehicle one step, honouring the live signal states.
 
-        A vehicle only crosses a junction when the signal facing its exit road
-        is green. Vehicles that cannot cross accumulate waiting time; each
-        vehicle that does cross removes itself from that road's queue.
+        Vehicles travel along roads between junctions. When a vehicle reaches a
+        junction junction, it waits there until the signal controlling its exit
+        direction turns green, then crosses into the next road.
+
+        Transit vehicles (currently on a road) are not visible at junctions and
+        are unaffected by signal state until they arrive.
         """
         arrived = []
         cleared: Dict[str, float] = {}      # junction -> vehicles cleared this step
         step_capacity = SAT_FLOW * SIM_DT   # veh a junction can clear per step
 
         for v in self.vehicles:
+            # === TRANSIT PHASE: vehicle traveling along a road between junctions ===
+            if v.current_road:
+                road = None
+                for junc in self.junctions.values():
+                    if v.current_road in junc.roads_out:
+                        road = junc.roads_out[v.current_road]
+                        break
+                    if v.current_road in junc.roads_in:
+                        road = junc.roads_in[v.current_road]
+                        break
+
+                if road is None:
+                    # Road not found - vehicle stays at its current junction
+                    v.current_road = ""
+                    continue
+
+                # Advance position along the road
+                speed = road.congested_speed() * v.speed_factor
+                distance_travelled = (speed / 3600.0) * SIM_DT  # km travelled this step
+                position_delta = distance_travelled / (road.length_m / 1000.0)  # fraction of road
+                v.road_position += position_delta
+                v.travel_time += SIM_DT
+
+                # Vehicle reached the end of the road
+                if v.road_position >= 1.0:
+                    v.road_position = 0.0
+                    v.current_road = ""
+                    v.current_junction = road.to_junction
+                    # Vehicle is now at the junction junction, will be processed below
+                    # Fall through to junction phase
+                else:
+                    continue  # Vehicle still in transit, skip rest of loop
+
+            # === JUNCTION PHASE: vehicle waiting at a junction ===
             junc = self.junctions.get(v.current_junction)
             if junc is None or v.is_at_destination():
                 arrived.append(v)
@@ -164,6 +205,9 @@ class TrafficEngine:
                 v.travel_time += SIM_DT
                 if road:
                     road.queue = max(0.0, road.queue - QUEUE_UNITS_PER_VEHICLE)
+                    # Vehicle starts transiting the next road immediately
+                    v.current_road = road.road_id
+                    v.road_position = 0.0
             else:
                 # Red (or junction saturated): vehicle waits
                 v.wait_time += SIM_DT
@@ -240,6 +284,73 @@ class TrafficEngine:
             "vehicles_moving": moving,
             "vehicles_stopped": stopped,
         }
+
+    # ── Vehicle position helpers for visualization ──────────────────────────────
+
+    def get_vehicle_positions(self) -> List[dict]:
+        """Return vehicle positions suitable for map overlay.
+
+        Each entry: {id, lat, lon, road_id, position (0-1), color, size}
+        Transit vehicles are placed along the road geometry.
+        Junction vehicles are placed at the junction center.
+        """
+        positions = []
+        for v in self.vehicles:
+            if v.is_at_destination():
+                continue  # Don't show arrived vehicles
+
+            # Find the road the vehicle is on
+            road = None
+            if v.current_road:
+                for junc in self.junctions.values():
+                    if v.current_road in junc.roads_out:
+                        road = junc.roads_out[v.current_road]
+                        break
+                    if v.current_road in junc.roads_in:
+                        road = junc.roads_in[v.current_road]
+                        break
+
+            if road and v.current_road and v.road_position > 0:
+                # Vehicle is in transit along a road
+                from_j = self.junctions.get(road.from_junction)
+                to_j = self.junctions.get(road.to_junction)
+                if from_j and to_j:
+                    # Interpolate position between from and to junction
+                    t = v.road_position
+                    lat = from_j.lat + (to_j.lat - from_j.lat) * t
+                    lon = from_j.lon + (to_j.lon - from_j.lon) * t
+                    color = "#00cc44" if v.is_emergency else ("#ff6600" if v.wait_time > 60 else "#4488ff")
+                    positions.append({
+                        "id": v.vehicle_id,
+                        "lat": lat,
+                        "lon": lon,
+                        "road_id": v.current_road,
+                        "position": v.road_position,
+                        "color": color,
+                        "size": 8 if v.is_emergency else 6,
+                        "wait_time": v.wait_time,
+                        "type": "transit",
+                    })
+                    continue
+
+            # Vehicle is at a junction (waiting or just arrived)
+            junc = self.junctions.get(v.current_junction)
+            if junc:
+                color = "#00cc44" if v.is_emergency else ("#ffaa00" if v.wait_time > 30 else "#4488ff")
+                positions.append({
+                    "id": v.vehicle_id,
+                    "lat": junc.lat,
+                    "lon": junc.lon,
+                    "road_id": "",
+                    "position": 0.0,
+                    "color": color,
+                    "size": 8 if v.is_emergency else 5,
+                    "wait_time": v.wait_time,
+                    "type": "junction",
+                    "junction_id": v.current_junction,
+                })
+
+        return positions
 
     # ── Manual signal control ─────────────────────────────────────────────────
 

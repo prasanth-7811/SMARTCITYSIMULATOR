@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2026-09-20T06:28:29.177754+05:30 by Eclipse SUMO netconvert 1.27.1
+<netconvertConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
+
+    <input>
+        <node-files value="C:\Users\hp\OneDrive\Desktop\coimbatore-smart-traffic\sumo\coimbatore_nodes.nod.xml"/>
+        <edge-files value="C:\Users\hp\OneDrive\Desktop\coimbatore-smart-traffic\sumo\coimbatore_edges.edg.xml"/>
+        <type-files value="C:\Users\hp\OneDrive\Desktop\coimbatore-smart-traffic\sumo\coimbatore_types.typ.xml"/>
+    </input>
+
+    <output>
+        <output-file value="C:\Users\hp\OneDrive\Desktop\coimbatore-smart-traffic\sumo\coimbatore_traffic.net.xml"/>
+    </output>
+
+    <junctions>
+        <no-turnarounds value="true"/>
+    </junctions>
+
+    <report>
+        <no-warnings value="true"/>
+    </report>
+
+</netconvertConfiguration>
+-->
+
+<net version="1.20" junctionCornerDetail="5" limitTurnSpeed="5.50" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/net_file.xsd">
+
+    <location netOffset="3080.05,2458.13" convBoundary="0.00,0.00,7856.52,4421.60" origBoundary="-3080.05,-2458.13,4776.47,1963.47" projParameter="!"/>
+
+    <type id="arterial" priority="3" numLanes="1" speed="13.89"/>
+
+    <edge id=":gandhipuram_0" function="internal">
+        <lane id=":gandhipuram_0_0" index="0" speed="13.89" length="18.24" shape="1190.55,2956.66 1187.07,2959.14 1182.97,2961.78 1178.72,2964.13 1174.80,2965.73"/>
+    </edge>
+    <edge id=":gandhipuram_1" function="internal">
+        <lane id=":gandhipuram_1_0" index="0" speed="7.43" length="6.38" shape="1190.55,2956.66 1185.18,2959.82 1185.03,2959.82"/>
+    </edge>
+    <edge id=":gandhipuram_6" function="internal">
+        <lane id=":gandhipuram_6_0" index="0" speed="7.43" length="13.06" shape="1185.03,2959.82 1181.69,2959.85 1180.07,2956.75 1180.34,2950.52"/>
+    </edge>
+    <edge id=":gandhipuram_2" function="internal">
+        <lane id=":gandhipuram_2_0" index="0" speed="5.47" length="9.77" shape="1183.50,2951.01 1183.37,2954.14 1184.18,2955.70 1185.93,2955.68 1188.63,2954.10"/>
+    </edge>
+    <edge id=":gandhipuram_3" function="internal">
+        <lane id=":gandhipuram_3_0" index="0" speed="10.89" length="17.95" shape="1183.50,2951.01 1182.22,2956.70 1180.35,2961.04 1177.87,2964.05 1174.80,2965.73"/>
+    </edge>
+    <edge id=":gandhipuram_4" function="internal">
+        <lane id=":gandhipuram_4_0" index="0" speed="9.79" length="14.37" shape="1173.88,2962.67 1176.09,2961.37 1177.90,2958.91 1179.32,2955.30 1180.34,2950.52"/>
+    </edge>
+    <edge id=":gandhipuram_5" function="internal">
+        <lane id=":gandhipuram_5_0" index="0" speed="13.89" length="17.13" shape="1173.88,2962.67 1177.65,2961.14 1181.55,2958.97 1185.31,2956.50 1188.63,2954.10"/>
+    </edge>
+    <edge id=":hopes_0" function="internal">
+        <lane id=":hopes_0_0" index="0" speed="6.70" length="16.23" shape="7.84,3321.10 3.12,3318.61 1.62,3316.28 3.33,3314.09 8.27,3312.05"/>
+    </edge>
+    <edge id=":hopes_1" function="internal">
+        <lane id=":hopes_1_0" index="0" speed="4.23" length="5.41" shape="9.18,3315.12 7.54,3315.80 6.97,3316.53 7.47,3317.30 9.04,3318.13"/>
+    </edge>
+    <edge id=":peelamedu_0" function="internal">
+        <lane id=":peelamedu_0_0" index="0" speed="11.06" length="26.88" shape="7858.12,4125.73 7856.75,4130.17 7852.62,4133.52 7845.75,4135.77 7836.14,4136.94"/>
+    </edge>
+    <edge id=":peelamedu_1" function="internal">
+        <lane id=":peelamedu_1_0" index="0" speed="9.51" length="6.03" shape="7858.12,4125.73 7856.37,4130.56 7855.54,4130.86"/>
+    </edge>
+    <edge id=":peelamedu_6" function="internal">
+        <lane id=":peelamedu_6_0" index="0" speed="9.51" length="19.56" shape="7855.54,4130.86 7851.65,4132.22 7844.79,4131.48 7836.59,4129.12"/>
+    </edge>
+    <edge id=":peelamedu_2" function="internal">
+        <lane id=":peelamedu_2_0" index="0" speed="8.32" length="19.28" shape="7837.62,4126.09 7845.19,4128.27 7850.59,4128.93 7853.84,4128.09 7854.92,4125.73"/>
+    </edge>
+    <edge id=":peelamedu_3" function="internal">
+        <lane id=":peelamedu_3_0" index="0" speed="6.13" length="15.09" shape="7837.62,4126.09 7840.67,4128.56 7841.31,4132.12 7839.74,4135.37 7836.14,4136.94"/>
+    </edge>
+    <edge id=":peelamedu_4" function="internal">
+        <lane id=":peelamedu_4_0" index="0" speed="5.77" length="13.12" shape="7835.96,4133.74 7840.58,4133.19 7842.23,4132.24 7840.90,4130.88 7836.59,4129.12"/>
+    </edge>
+    <edge id=":peelamedu_5" function="internal">
+        <lane id=":peelamedu_5_0" index="0" speed="10.07" length="22.09" shape="7835.96,4133.74 7844.25,4132.84 7850.18,4131.21 7853.73,4128.83 7854.92,4125.73"/>
+    </edge>
+    <edge id=":race_course_0" function="internal">
+        <lane id=":race_course_0_0" index="0" speed="9.88" length="11.98" shape="2190.27,2214.14 2187.86,2213.76 2185.21,2214.19 2182.32,2215.41 2179.20,2217.44"/>
+    </edge>
+    <edge id=":race_course_1" function="internal">
+        <lane id=":race_course_1_0" index="0" speed="13.89" length="14.88" shape="2190.27,2214.14 2186.78,2212.82 2183.40,2211.31 2180.09,2209.64 2176.81,2207.85"/>
+    </edge>
+    <edge id=":race_course_2" function="internal">
+        <lane id=":race_course_2_0" index="0" speed="13.89" length="14.30" shape="2178.36,2205.06 2181.56,2206.80 2184.69,2208.39 2187.89,2209.83 2191.30,2211.11"/>
+    </edge>
+    <edge id=":race_course_3" function="internal">
+        <lane id=":race_course_3_0" index="0" speed="7.46" length="4.56" shape="2178.36,2205.06 2182.01,2207.80"/>
+    </edge>
+    <edge id=":race_course_6" function="internal">
+        <lane id=":race_course_6_0" index="0" speed="7.46" length="11.58" shape="2182.01,2207.80 2182.15,2207.91 2183.56,2210.92 2182.57,2214.10 2179.20,2217.44"/>
+    </edge>
+    <edge id=":race_course_4" function="internal">
+        <lane id=":race_course_4_0" index="0" speed="5.79" length="9.15" shape="2177.28,2214.87 2179.19,2212.98 2179.75,2211.18 2178.96,2209.47 2176.81,2207.85"/>
+    </edge>
+    <edge id=":race_course_5" function="internal">
+        <lane id=":race_course_5_0" index="0" speed="11.03" length="15.08" shape="2177.28,2214.87 2181.10,2212.44 2184.70,2211.00 2188.10,2210.56 2191.30,2211.11"/>
+    </edge>
+    <edge id=":rs_puram_0" function="internal">
+        <lane id=":rs_puram_0_0" index="0" speed="6.14" length="6.44" shape="1192.45,1660.71 1191.08,1659.69 1190.23,1658.44 1189.92,1656.97 1190.15,1655.27"/>
+    </edge>
+    <edge id=":rs_puram_1" function="internal">
+        <lane id=":rs_puram_1_0" index="0" speed="3.93" length="2.15" shape="1193.24,1656.10 1193.16,1656.67 1193.27,1657.16 1193.55,1657.58 1194.00,1657.92"/>
+    </edge>
+    <edge id=":saibaba_colony_0" function="internal">
+        <lane id=":saibaba_colony_0_0" index="0" speed="8.36" length="2.13" shape="2732.55,4423.16 2731.93,4423.18 2731.49,4423.16 2731.07,4423.04 2730.49,4422.81"/>
+    </edge>
+    <edge id=":saibaba_colony_1" function="internal">
+        <lane id=":saibaba_colony_1_0" index="0" speed="13.89" length="0.71" shape="2731.69,4419.85 2731.88,4419.92 2732.02,4419.96 2732.17,4419.97 2732.38,4419.96"/>
+    </edge>
+    <edge id=":singanallur_0" function="internal">
+        <lane id=":singanallur_0_0" index="0" speed="3.92" length="2.30" shape="7854.92,964.43 7854.84,963.82 7854.58,963.35 7854.16,963.03 7853.56,962.85"/>
+    </edge>
+    <edge id=":singanallur_1" function="internal">
+        <lane id=":singanallur_1_0" index="0" speed="6.11" length="6.91" shape="7854.05,959.69 7855.83,960.22 7857.10,961.19 7857.87,962.59 7858.12,964.43"/>
+    </edge>
+    <edge id=":ukkadam_0" function="internal">
+        <lane id=":ukkadam_0_0" index="0" speed="6.51" length="9.02" shape="1645.92,2.68 1643.45,2.65 1641.56,3.42 1640.25,4.99 1639.53,7.35"/>
+    </edge>
+    <edge id=":ukkadam_1" function="internal">
+        <lane id=":ukkadam_1_0" index="0" speed="6.91" length="9.46" shape="1645.92,2.68 1643.34,2.64 1641.28,3.38 1639.75,4.91 1638.76,7.22"/>
+    </edge>
+    <edge id=":ukkadam_2" function="internal">
+        <lane id=":ukkadam_2_0" index="0" speed="8.42" length="14.49" shape="1635.58,6.71 1637.12,3.07 1639.44,0.66 1642.53,-0.53 1646.41,-0.48"/>
+    </edge>
+    <edge id=":ukkadam_3" function="internal">
+        <lane id=":ukkadam_3_0" index="0" speed="3.95" length="1.44" shape="1635.58,6.71 1636.49,5.60"/>
+    </edge>
+    <edge id=":ukkadam_6" function="internal">
+        <lane id=":ukkadam_6_0" index="0" speed="3.95" length="4.19" shape="1636.49,5.60 1637.90,5.40 1639.14,6.02 1639.53,7.35"/>
+    </edge>
+    <edge id=":ukkadam_4" function="internal">
+        <lane id=":ukkadam_4_0" index="0" speed="8.00" length="14.17" shape="1636.37,6.84 1637.50,3.13 1639.55,0.68 1642.52,-0.53 1646.41,-0.48"/>
+    </edge>
+    <edge id=":ukkadam_5" function="internal">
+        <lane id=":ukkadam_5_0" index="0" speed="6.94" length="22.04" shape="1636.37,6.84 1635.27,14.96 1635.30,17.73 1636.46,15.15 1638.76,7.22"/>
+    </edge>
+
+    <edge id="E_gandhipuram_hopes" from="gandhipuram" to="hopes" priority="3" type="arterial">
+        <lane id="E_gandhipuram_hopes_0" index="0" speed="13.89" length="1216.86" shape="1174.80,2965.73 9.18,3315.12"/>
+    </edge>
+    <edge id="E_gandhipuram_race_course" from="gandhipuram" to="race_course" priority="3" type="arterial">
+        <lane id="E_gandhipuram_race_course_0" index="0" speed="13.89" length="1234.45" shape="1188.63,2954.10 2177.28,2214.87"/>
+    </edge>
+    <edge id="E_gandhipuram_ukkadam" from="gandhipuram" to="ukkadam" priority="3" type="arterial">
+        <lane id="E_gandhipuram_ukkadam_0" index="0" speed="13.89" length="2978.80" shape="1180.34,2950.52 1636.37,6.84"/>
+    </edge>
+    <edge id="E_hopes_gandhipuram" from="hopes" to="gandhipuram" priority="3" type="arterial">
+        <lane id="E_hopes_gandhipuram_0" index="0" speed="13.89" length="1216.86" shape="8.27,3312.05 1173.88,2962.67"/>
+    </edge>
+    <edge id="E_hopes_saibaba_colony" from="hopes" to="saibaba_colony" priority="3" type="arterial">
+        <lane id="E_hopes_saibaba_colony_0" index="0" speed="13.89" length="2937.10" shape="9.04,3318.13 2731.69,4419.85"/>
+    </edge>
+    <edge id="E_peelamedu_race_course" from="peelamedu" to="race_course" priority="3" type="arterial">
+        <lane id="E_peelamedu_race_course_0" index="0" speed="13.89" length="5962.22" shape="7836.59,4129.12 2190.27,2214.14"/>
+    </edge>
+    <edge id="E_peelamedu_saibaba_colony" from="peelamedu" to="saibaba_colony" priority="3" type="arterial">
+        <lane id="E_peelamedu_saibaba_colony_0" index="0" speed="13.89" length="5111.60" shape="7836.14,4136.94 2732.55,4423.16"/>
+    </edge>
+    <edge id="E_peelamedu_singanallur" from="peelamedu" to="singanallur" priority="3" type="arterial">
+        <lane id="E_peelamedu_singanallur_0" index="0" speed="13.89" length="3161.29" shape="7854.92,4125.73 7854.92,964.43"/>
+    </edge>
+    <edge id="E_race_course_gandhipuram" from="race_course" to="gandhipuram" priority="3" type="arterial">
+        <lane id="E_race_course_gandhipuram_0" index="0" speed="13.89" length="1234.45" shape="2179.20,2217.44 1190.55,2956.66"/>
+    </edge>
+    <edge id="E_race_course_peelamedu" from="race_course" to="peelamedu" priority="3" type="arterial">
+        <lane id="E_race_course_peelamedu_0" index="0" speed="13.89" length="5962.22" shape="2191.30,2211.11 7837.62,4126.09"/>
+    </edge>
+    <edge id="E_race_course_rs_puram" from="race_course" to="rs_puram" priority="3" type="arterial">
+        <lane id="E_race_course_rs_puram_0" index="0" speed="13.89" length="1126.20" shape="2176.81,2207.85 1192.45,1660.71"/>
+    </edge>
+    <edge id="E_rs_puram_race_course" from="rs_puram" to="race_course" priority="3" type="arterial">
+        <lane id="E_rs_puram_race_course_0" index="0" speed="13.89" length="1126.20" shape="1194.00,1657.92 2178.36,2205.06"/>
+    </edge>
+    <edge id="E_rs_puram_ukkadam" from="rs_puram" to="ukkadam" priority="3" type="arterial">
+        <lane id="E_rs_puram_ukkadam_0" index="0" speed="13.89" length="1707.67" shape="1190.15,1655.27 1635.58,6.71"/>
+    </edge>
+    <edge id="E_saibaba_colony_hopes" from="saibaba_colony" to="hopes" priority="3" type="arterial">
+        <lane id="E_saibaba_colony_hopes_0" index="0" speed="13.89" length="2937.10" shape="2730.49,4422.81 7.84,3321.10"/>
+    </edge>
+    <edge id="E_saibaba_colony_peelamedu" from="saibaba_colony" to="peelamedu" priority="3" type="arterial">
+        <lane id="E_saibaba_colony_peelamedu_0" index="0" speed="13.89" length="5111.60" shape="2732.38,4419.96 7835.96,4133.74"/>
+    </edge>
+    <edge id="E_singanallur_peelamedu" from="singanallur" to="peelamedu" priority="3" type="arterial">
+        <lane id="E_singanallur_peelamedu_0" index="0" speed="13.89" length="3161.29" shape="7858.12,964.43 7858.12,4125.73"/>
+    </edge>
+    <edge id="E_singanallur_ukkadam" from="singanallur" to="ukkadam" priority="3" type="arterial">
+        <lane id="E_singanallur_ukkadam_0" index="0" speed="13.89" length="6281.46" shape="7853.56,962.85 1645.92,2.68"/>
+    </edge>
+    <edge id="E_ukkadam_gandhipuram" from="ukkadam" to="gandhipuram" priority="3" type="arterial">
+        <lane id="E_ukkadam_gandhipuram_0" index="0" speed="13.89" length="2978.78" shape="1639.53,7.35 1183.50,2951.01"/>
+    </edge>
+    <edge id="E_ukkadam_rs_puram" from="ukkadam" to="rs_puram" priority="3" type="arterial">
+        <lane id="E_ukkadam_rs_puram_0" index="0" speed="13.89" length="1708.00" shape="1638.76,7.22 1193.24,1656.10"/>
+    </edge>
+    <edge id="E_ukkadam_singanallur" from="ukkadam" to="singanallur" priority="3" type="arterial">
+        <lane id="E_ukkadam_singanallur_0" index="0" speed="13.89" length="6281.46" shape="1646.41,-0.48 7854.05,959.69"/>
+    </edge>
+
+    <tlLogic id="gandhipuram" type="static" programID="0" offset="0">
+        <phase duration="42" state="GgrrGG"/>
+        <phase duration="3"  state="yyrrGy"/>
+        <phase duration="42" state="rrGGGr"/>
+        <phase duration="3"  state="rryyGr"/>
+    </tlLogic>
+    <tlLogic id="hopes" type="static" programID="0" offset="0">
+        <phase duration="90" state="GG"/>
+    </tlLogic>
+    <tlLogic id="peelamedu" type="static" programID="0" offset="0">
+        <phase duration="42" state="GgrrGG"/>
+        <phase duration="3"  state="yyrrGy"/>
+        <phase duration="42" state="rrGGGr"/>
+        <phase duration="3"  state="rryyGr"/>
+    </tlLogic>
+    <tlLogic id="race_course" type="static" programID="0" offset="0">
+        <phase duration="42" state="GGGgrr"/>
+        <phase duration="3"  state="Gyyyrr"/>
+        <phase duration="42" state="GrrrGG"/>
+        <phase duration="3"  state="Grrryy"/>
+    </tlLogic>
+    <tlLogic id="rs_puram" type="static" programID="0" offset="0">
+        <phase duration="90" state="GG"/>
+    </tlLogic>
+    <tlLogic id="saibaba_colony" type="static" programID="0" offset="0">
+        <phase duration="82" state="GG"/>
+        <phase duration="3"  state="yy"/>
+        <phase duration="5"  state="rr"/>
+    </tlLogic>
+    <tlLogic id="singanallur" type="static" programID="0" offset="0">
+        <phase duration="90" state="GG"/>
+    </tlLogic>
+    <tlLogic id="ukkadam" type="static" programID="0" offset="0">
+        <phase duration="42" state="GGGgrr"/>
+        <phase duration="3"  state="Gyyyrr"/>
+        <phase duration="41" state="GrrrGG"/>
+        <phase duration="3"  state="yrrryy"/>
+        <phase duration="1"  state="rrrrrr"/>
+    </tlLogic>
+
+    <junction id="gandhipuram" type="traffic_light" x="1180.11" y="2962.47" incLanes="E_race_course_gandhipuram_0 E_ukkadam_gandhipuram_0 E_hopes_gandhipuram_0" intLanes=":gandhipuram_0_0 :gandhipuram_6_0 :gandhipuram_2_0 :gandhipuram_3_0 :gandhipuram_4_0 :gandhipuram_5_0" shape="1191.51,2957.94 1187.68,2952.82 1185.96,2953.71 1185.43,2953.63 1185.10,2953.19 1184.99,2952.40 1185.08,2951.26 1178.76,2950.28 1178.19,2953.28 1177.50,2955.80 1176.67,2957.85 1175.72,2959.42 1174.64,2960.51 1173.43,2961.13 1175.26,2967.26 1179.06,2966.03 1181.79,2964.90 1183.94,2963.70 1185.96,2962.25 1188.32,2960.39">
+        <request index="0" response="000000" foes="001000" cont="0"/>
+        <request index="1" response="110000" foes="111000" cont="1"/>
+        <request index="2" response="100000" foes="100000" cont="0"/>
+        <request index="3" response="100011" foes="100011" cont="0"/>
+        <request index="4" response="000000" foes="000010" cont="0"/>
+        <request index="5" response="000000" foes="001110" cont="0"/>
+    </junction>
+    <junction id="hopes" type="traffic_light" x="0.00" y="3316.20" incLanes="E_saibaba_colony_hopes_0 E_gandhipuram_hopes_0" intLanes=":hopes_0_0 :hopes_1_0" shape="7.24,3322.58 9.64,3316.65 7.81,3310.52 2.94,3312.31 -0.01,3314.18 -1.06,3316.15 -0.20,3318.21 2.57,3320.35">
+        <request index="0" response="00" foes="00" cont="0"/>
+        <request index="1" response="00" foes="00" cont="0"/>
+    </junction>
+    <junction id="peelamedu" type="traffic_light" x="7856.52" y="4134.19" incLanes="E_singanallur_peelamedu_0 E_race_course_peelamedu_0 E_saibaba_colony_peelamedu_0" intLanes=":peelamedu_0_0 :peelamedu_6_0 :peelamedu_2_0 :peelamedu_3_0 :peelamedu_4_0 :peelamedu_5_0" shape="7859.72,4125.73 7853.32,4125.73 7851.63,4127.38 7849.52,4127.44 7846.57,4126.99 7842.77,4126.04 7838.13,4124.57 7836.07,4130.63 7835.87,4132.14 7836.23,4138.53 7843.40,4137.81 7849.28,4136.52 7853.85,4134.67 7857.11,4132.26 7859.07,4129.27">
+        <request index="0" response="000000" foes="001000" cont="0"/>
+        <request index="1" response="110000" foes="111000" cont="1"/>
+        <request index="2" response="100000" foes="100000" cont="0"/>
+        <request index="3" response="100011" foes="100011" cont="0"/>
+        <request index="4" response="000000" foes="000010" cont="0"/>
+        <request index="5" response="000000" foes="001110" cont="0"/>
+    </junction>
+    <junction id="race_course" type="traffic_light" x="2185.40" y="2210.80" incLanes="E_peelamedu_race_course_0 E_rs_puram_race_course_0 E_gandhipuram_race_course_0" intLanes=":race_course_0_0 :race_course_1_0 :race_course_2_0 :race_course_6_0 :race_course_4_0 :race_course_5_0" shape="2189.76,2215.66 2191.81,2209.60 2189.00,2208.61 2186.94,2207.81 2185.28,2207.06 2183.67,2206.21 2179.14,2203.66 2176.03,2209.25 2177.62,2210.60 2177.85,2211.31 2177.71,2212.04 2177.20,2212.81 2176.32,2213.59 2180.16,2218.72 2182.04,2217.43 2183.81,2216.45 2185.46,2215.78 2187.01,2215.43 2188.44,2215.38">
+        <request index="0" response="000000" foes="001000" cont="0"/>
+        <request index="1" response="000000" foes="111000" cont="0"/>
+        <request index="2" response="000000" foes="100000" cont="0"/>
+        <request index="3" response="000011" foes="100011" cont="1"/>
+        <request index="4" response="000010" foes="000010" cont="0"/>
+        <request index="5" response="001110" foes="001110" cont="0"/>
+    </junction>
+    <junction id="rs_puram" type="traffic_light" x="1191.04" y="1658.10" incLanes="E_race_course_rs_puram_0 E_ukkadam_rs_puram_0" intLanes=":rs_puram_0_0 :rs_puram_1_0" shape="1191.67,1662.11 1194.78,1656.52 1188.60,1654.85 1188.36,1657.80 1188.72,1659.08 1189.39,1660.23 1190.37,1661.24">
+        <request index="0" response="00" foes="00" cont="0"/>
+        <request index="1" response="00" foes="00" cont="0"/>
+    </junction>
+    <junction id="saibaba_colony" type="traffic_light" x="2731.75" y="4421.60" incLanes="E_peelamedu_saibaba_colony_0 E_hopes_saibaba_colony_0" intLanes=":saibaba_colony_0_0 :saibaba_colony_1_0" shape="2732.64,4424.75 2732.29,4418.36 2729.89,4424.30 2730.87,4424.67 2731.23,4424.75 2731.60,4424.79 2732.05,4424.78">
+        <request index="0" response="00" foes="00" cont="0"/>
+        <request index="1" response="00" foes="00" cont="0"/>
+    </junction>
+    <junction id="singanallur" type="traffic_light" x="7856.52" y="961.69" incLanes="E_peelamedu_singanallur_0 E_ukkadam_singanallur_0" intLanes=":singanallur_0_0 :singanallur_1_0" shape="7853.32,964.43 7859.72,964.43 7859.12,961.29 7858.36,960.11 7857.31,959.18 7855.95,958.52 7854.30,958.11">
+        <request index="0" response="00" foes="00" cont="0"/>
+        <request index="1" response="00" foes="00" cont="0"/>
+    </junction>
+    <junction id="ukkadam" type="traffic_light" x="1639.05" y="0.00" incLanes="E_singanallur_ukkadam_0 E_rs_puram_ukkadam_0 E_gandhipuram_ukkadam_0" intLanes=":ukkadam_0_0 :ukkadam_1_0 :ukkadam_2_0 :ukkadam_6_0 :ukkadam_4_0 :ukkadam_5_0" shape="1645.68,4.26 1646.65,-2.06 1643.54,-2.25 1640.83,-1.80 1638.52,-0.70 1636.61,1.04 1635.10,3.43 1633.99,6.46 1641.11,7.60 1641.89,5.48 1642.56,4.79 1643.41,4.36 1644.45,4.19">
+        <request index="0" response="000000" foes="001000" cont="0"/>
+        <request index="1" response="000000" foes="111000" cont="0"/>
+        <request index="2" response="000000" foes="010000" cont="0"/>
+        <request index="3" response="000011" foes="010011" cont="1"/>
+        <request index="4" response="001110" foes="001110" cont="0"/>
+        <request index="5" response="000010" foes="000010" cont="0"/>
+    </junction>
+
+    <junction id=":gandhipuram_6_0" type="internal" x="1185.03" y="2959.82" incLanes=":gandhipuram_1_0 E_hopes_gandhipuram_0" intLanes=":gandhipuram_3_0 :gandhipuram_4_0 :gandhipuram_5_0"/>
+    <junction id=":peelamedu_6_0" type="internal" x="7855.54" y="4130.86" incLanes=":peelamedu_1_0 E_saibaba_colony_peelamedu_0" intLanes=":peelamedu_3_0 :peelamedu_4_0 :peelamedu_5_0"/>
+    <junction id=":race_course_6_0" type="internal" x="2182.01" y="2207.80" incLanes=":race_course_3_0 E_peelamedu_race_course_0" intLanes=":race_course_0_0 :race_course_1_0 :race_course_5_0"/>
+    <junction id=":ukkadam_6_0" type="internal" x="1636.49" y="5.60" incLanes=":ukkadam_3_0 E_singanallur_ukkadam_0" intLanes=":ukkadam_0_0 :ukkadam_1_0 :ukkadam_4_0"/>
+
+    <connection from="E_gandhipuram_hopes" to="E_hopes_saibaba_colony" fromLane="0" toLane="0" via=":hopes_1_0" tl="hopes" linkIndex="1" dir="r" state="O"/>
+    <connection from="E_gandhipuram_race_course" to="E_race_course_rs_puram" fromLane="0" toLane="0" via=":race_course_4_0" tl="race_course" linkIndex="4" dir="r" state="o"/>
+    <connection from="E_gandhipuram_race_course" to="E_race_course_peelamedu" fromLane="0" toLane="0" via=":race_course_5_0" tl="race_course" linkIndex="5" dir="l" state="o"/>
+    <connection from="E_gandhipuram_ukkadam" to="E_ukkadam_singanallur" fromLane="0" toLane="0" via=":ukkadam_4_0" tl="ukkadam" linkIndex="4" dir="l" state="o"/>
+    <connection from="E_gandhipuram_ukkadam" to="E_ukkadam_rs_puram" fromLane="0" toLane="0" via=":ukkadam_5_0" tl="ukkadam" linkIndex="5" dir="r" state="o"/>
+    <connection from="E_hopes_gandhipuram" to="E_gandhipuram_ukkadam" fromLane="0" toLane="0" via=":gandhipuram_4_0" tl="gandhipuram" linkIndex="4" dir="r" state="O"/>
+    <connection from="E_hopes_gandhipuram" to="E_gandhipuram_race_course" fromLane="0" toLane="0" via=":gandhipuram_5_0" tl="gandhipuram" linkIndex="5" dir="s" state="O"/>
+    <connection from="E_hopes_saibaba_colony" to="E_saibaba_colony_peelamedu" fromLane="0" toLane="0" via=":saibaba_colony_1_0" tl="saibaba_colony" linkIndex="1" dir="s" state="O"/>
+    <connection from="E_peelamedu_race_course" to="E_race_course_gandhipuram" fromLane="0" toLane="0" via=":race_course_0_0" tl="race_course" linkIndex="0" dir="r" state="O"/>
+    <connection from="E_peelamedu_race_course" to="E_race_course_rs_puram" fromLane="0" toLane="0" via=":race_course_1_0" tl="race_course" linkIndex="1" dir="s" state="O"/>
+    <connection from="E_peelamedu_saibaba_colony" to="E_saibaba_colony_hopes" fromLane="0" toLane="0" via=":saibaba_colony_0_0" tl="saibaba_colony" linkIndex="0" dir="s" state="O"/>
+    <connection from="E_peelamedu_singanallur" to="E_singanallur_ukkadam" fromLane="0" toLane="0" via=":singanallur_0_0" tl="singanallur" linkIndex="0" dir="r" state="O"/>
+    <connection from="E_race_course_gandhipuram" to="E_gandhipuram_hopes" fromLane="0" toLane="0" via=":gandhipuram_0_0" tl="gandhipuram" linkIndex="0" dir="s" state="O"/>
+    <connection from="E_race_course_gandhipuram" to="E_gandhipuram_ukkadam" fromLane="0" toLane="0" via=":gandhipuram_1_0" tl="gandhipuram" linkIndex="1" dir="l" state="o"/>
+    <connection from="E_race_course_peelamedu" to="E_peelamedu_singanallur" fromLane="0" toLane="0" via=":peelamedu_2_0" tl="peelamedu" linkIndex="2" dir="r" state="o"/>
+    <connection from="E_race_course_peelamedu" to="E_peelamedu_saibaba_colony" fromLane="0" toLane="0" via=":peelamedu_3_0" tl="peelamedu" linkIndex="3" dir="l" state="o"/>
+    <connection from="E_race_course_rs_puram" to="E_rs_puram_ukkadam" fromLane="0" toLane="0" via=":rs_puram_0_0" tl="rs_puram" linkIndex="0" dir="l" state="O"/>
+    <connection from="E_rs_puram_race_course" to="E_race_course_peelamedu" fromLane="0" toLane="0" via=":race_course_2_0" tl="race_course" linkIndex="2" dir="s" state="O"/>
+    <connection from="E_rs_puram_race_course" to="E_race_course_gandhipuram" fromLane="0" toLane="0" via=":race_course_3_0" tl="race_course" linkIndex="3" dir="l" state="o"/>
+    <connection from="E_rs_puram_ukkadam" to="E_ukkadam_singanallur" fromLane="0" toLane="0" via=":ukkadam_2_0" tl="ukkadam" linkIndex="2" dir="L" state="O"/>
+    <connection from="E_rs_puram_ukkadam" to="E_ukkadam_gandhipuram" fromLane="0" toLane="0" via=":ukkadam_3_0" tl="ukkadam" linkIndex="3" dir="l" state="o"/>
+    <connection from="E_saibaba_colony_hopes" to="E_hopes_gandhipuram" fromLane="0" toLane="0" via=":hopes_0_0" tl="hopes" linkIndex="0" dir="l" state="O"/>
+    <connection from="E_saibaba_colony_peelamedu" to="E_peelamedu_race_course" fromLane="0" toLane="0" via=":peelamedu_4_0" tl="peelamedu" linkIndex="4" dir="r" state="O"/>
+    <connection from="E_saibaba_colony_peelamedu" to="E_peelamedu_singanallur" fromLane="0" toLane="0" via=":peelamedu_5_0" tl="peelamedu" linkIndex="5" dir="R" state="O"/>
+    <connection from="E_singanallur_peelamedu" to="E_peelamedu_saibaba_colony" fromLane="0" toLane="0" via=":peelamedu_0_0" tl="peelamedu" linkIndex="0" dir="L" state="O"/>
+    <connection from="E_singanallur_peelamedu" to="E_peelamedu_race_course" fromLane="0" toLane="0" via=":peelamedu_1_0" tl="peelamedu" linkIndex="1" dir="l" state="o"/>
+    <connection from="E_singanallur_ukkadam" to="E_ukkadam_gandhipuram" fromLane="0" toLane="0" via=":ukkadam_0_0" tl="ukkadam" linkIndex="0" dir="r" state="O"/>
+    <connection from="E_singanallur_ukkadam" to="E_ukkadam_rs_puram" fromLane="0" toLane="0" via=":ukkadam_1_0" tl="ukkadam" linkIndex="1" dir="R" state="O"/>
+    <connection from="E_ukkadam_gandhipuram" to="E_gandhipuram_race_course" fromLane="0" toLane="0" via=":gandhipuram_2_0" tl="gandhipuram" linkIndex="2" dir="r" state="o"/>
+    <connection from="E_ukkadam_gandhipuram" to="E_gandhipuram_hopes" fromLane="0" toLane="0" via=":gandhipuram_3_0" tl="gandhipuram" linkIndex="3" dir="l" state="o"/>
+    <connection from="E_ukkadam_rs_puram" to="E_rs_puram_race_course" fromLane="0" toLane="0" via=":rs_puram_1_0" tl="rs_puram" linkIndex="1" dir="r" state="O"/>
+    <connection from="E_ukkadam_singanallur" to="E_singanallur_peelamedu" fromLane="0" toLane="0" via=":singanallur_1_0" tl="singanallur" linkIndex="1" dir="l" state="O"/>
+
+    <connection from=":gandhipuram_0" to="E_gandhipuram_hopes" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from=":gandhipuram_1" to="E_gandhipuram_ukkadam" fromLane="0" toLane="0" via=":gandhipuram_6_0" dir="l" state="m"/>
+    <connection from=":gandhipuram_6" to="E_gandhipuram_ukkadam" fromLane="0" toLane="0" dir="l" state="M"/>
+    <connection from=":gandhipuram_2" to="E_gandhipuram_race_course" fromLane="0" toLane="0" dir="r" state="M"/>
+    <connection from=":gandhipuram_3" to="E_gandhipuram_hopes" fromLane="0" toLane="0" dir="l" state="M"/>
+    <connection from=":gandhipuram_4" to="E_gandhipuram_ukkadam" fromLane="0" toLane="0" dir="r" state="M"/>
+    <connection from=":gandhipuram_5" to="E_gandhipuram_race_course" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from=":hopes_0" to="E_hopes_gandhipuram" fromLane="0" toLane="0" dir="l" state="M"/>
+    <connection from=":hopes_1" to="E_hopes_saibaba_colony" fromLane="0" toLane="0" dir="r" state="M"/>
+    <connection from=":peelamedu_0" to="E_peelamedu_saibaba_colony" fromLane="0" toLane="0" dir="L" state="M"/>
+    <connection from=":peelamedu_1" to="E_peelamedu_race_course" fromLane="0" toLane="0" via=":peelamedu_6_0" dir="l" state="m"/>
+    <connection from=":peelamedu_6" to="E_peelamedu_race_course" fromLane="0" toLane="0" dir="l" state="M"/>
+    <connection from=":peelamedu_2" to="E_peelamedu_singanallur" fromLane="0" toLane="0" dir="r" state="M"/>
+    <connection from=":peelamedu_3" to="E_peelamedu_saibaba_colony" fromLane="0" toLane="0" dir="l" state="M"/>
+    <connection from=":peelamedu_4" to="E_peelamedu_race_course" fromLane="0" toLane="0" dir="r" state="M"/>
+    <connection from=":peelamedu_5" to="E_peelamedu_singanallur" fromLane="0" toLane="0" dir="R" state="M"/>
+    <connection from=":race_course_0" to="E_race_course_gandhipuram" fromLane="0" toLane="0" dir="r" state="M"/>
+    <connection from=":race_course_1" to="E_race_course_rs_puram" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from=":race_course_2" to="E_race_course_peelamedu" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from=":race_course_3" to="E_race_course_gandhipuram" fromLane="0" toLane="0" via=":race_course_6_0" dir="l" state="m"/>
+    <connection from=":race_course_6" to="E_race_course_gandhipuram" fromLane="0" toLane="0" dir="l" state="M"/>
+    <connection from=":race_course_4" to="E_race_course_rs_puram" fromLane="0" toLane="0" dir="r" state="M"/>
+    <connection from=":race_course_5" to="E_race_course_peelamedu" fromLane="0" toLane="0" dir="l" state="M"/>
+    <connection from=":rs_puram_0" to="E_rs_puram_ukkadam" fromLane="0" toLane="0" dir="l" state="M"/>
+    <connection from=":rs_puram_1" to="E_rs_puram_race_course" fromLane="0" toLane="0" dir="r" state="M"/>
+    <connection from=":saibaba_colony_0" to="E_saibaba_colony_hopes" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from=":saibaba_colony_1" to="E_saibaba_colony_peelamedu" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from=":singanallur_0" to="E_singanallur_ukkadam" fromLane="0" toLane="0" dir="r" state="M"/>
+    <connection from=":singanallur_1" to="E_singanallur_peelamedu" fromLane="0" toLane="0" dir="l" state="M"/>
+    <connection from=":ukkadam_0" to="E_ukkadam_gandhipuram" fromLane="0" toLane="0" dir="r" state="M"/>
+    <connection from=":ukkadam_1" to="E_ukkadam_rs_puram" fromLane="0" toLane="0" dir="R" state="M"/>
+    <connection from=":ukkadam_2" to="E_ukkadam_singanallur" fromLane="0" toLane="0" dir="L" state="M"/>
+    <connection from=":ukkadam_3" to="E_ukkadam_gandhipuram" fromLane="0" toLane="0" via=":ukkadam_6_0" dir="l" state="m"/>
+    <connection from=":ukkadam_6" to="E_ukkadam_gandhipuram" fromLane="0" toLane="0" dir="l" state="M"/>
+    <connection from=":ukkadam_4" to="E_ukkadam_singanallur" fromLane="0" toLane="0" dir="l" state="M"/>
+    <connection from=":ukkadam_5" to="E_ukkadam_rs_puram" fromLane="0" toLane="0" dir="r" state="M"/>
+
+</net>
